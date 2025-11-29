@@ -1,5 +1,5 @@
 /build/
-/out/
+out/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
