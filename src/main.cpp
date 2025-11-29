@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <cassert>
+#include "constants.h"
 
 using namespace std;
 
@@ -13,15 +14,6 @@ int main() {
 
     int THREADS = std::thread::hardware_concurrency();
     cout << "\nThreads: " << THREADS << "\n\n";
-    const float SENSITIVITY = 1.5;
-    const float upscaling = 2;
-
-    const int SCREEN_WIDTH = 1920;
-    const int SCREEN_HEIGHT = 1080;
-
-    const float MOVEMENT_SPEED = 2.5; // units / second
-
-    const unsigned int WORLD_SIZE = 2;
     
     Texture2D texture;
     RayTracer renderer = RayTracer(SCREEN_WIDTH / upscaling, SCREEN_HEIGHT / upscaling);

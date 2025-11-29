@@ -6,7 +6,7 @@ RayTracer::RayTracer(int width, int height) {
 
 	textureData = new unsigned char[width * height * 4];
 
-    fov = 70.0f * (3.14159265f / 180.0f);
+    fov = FOV * (PI_F / 180.0f);
     fd = (width / 2) / tan(fov / 2);
     fdSq = fd * fd;
 
@@ -53,103 +53,6 @@ void RayTracer::moveRight(float amount) {
     position += right * amount;
 
 }
-/*
-unsigned char* RayTracer::render(VoxelSpace& world) {
-
-    const int halfWidth = width / 2;
-    const int halfHeight = height / 2;
-
-    const RGBColor fill = { 255,0,0 };
-    const RGBColor background = { 0,0,0 };
-
-    for (int y = 0; y < height; y++) {
-
-        for (int x = 0; x < width; x++) {
-
-
-            // cache this eventually
-            float dist = sqrt(x*x + y*y + fdSq);
-
-            Vector3f dir = make_vec3f((x - halfWidth), (y - halfHeight), fd);
-            dir /= dist;
-
-            Vector3f RotatedDir = dir.x * right;
-
-            RotatedDir += dir.y * up;
-
-            RotatedDir += dir.z * forward;
-
-            unsigned int color = 0;
-            float distance = 0;
-            cast(world, position, RotatedDir, color, distance);
-
-            if (color == 1) {
-
-                set(x, y, fill);
-
-            }
-            else {
-                set(x, y, background);
-
-            }
-        }
-    }
-
-    return textureData;
-}
-
-*/
-
-/*
-unsigned char* RayTracer::render(VoxelSpace& world, int threadCount, int threadIndex) {
-
-    int linesPerThread = height / threadCount;
-
-    int startY = threadIndex * linesPerThread;
-
-    int endY = (threadIndex + 1) * linesPerThread;
-    if (threadCount == threadIndex + 1) {
-        endY = height;
-    }
-
-    const int halfWidth = width / 2;
-    const int halfHeight = height / 2;
-
-    const RGBColor fill = { 255,0,0 };
-    const RGBColor background = { 0,0,0 };
-
-    for (int y = startY; y < endY; y++) {
-
-        for (int x = 0; x < width; x++) {
-
-            // cache this eventually
-            float dist = sqrt(x * x + y * y + fdSq);
-
-            Vector3f dir = make_vec3f((x - halfWidth), (y - halfHeight), fd);
-            dir /= dist;
-
-            Vector3f RotatedDir = dir.x * right;
-            RotatedDir += dir.y * up;
-            RotatedDir += dir.z * forward;
-
-            unsigned int color = 0;
-            float distance = 0;
-            cast(world, position, RotatedDir, color, distance);
-
-            if (color == 1) {
-
-                set(x, y, fill);
-
-            }
-            else {
-                set(x, y, background);
-
-            }
-        }
-    }
-
-    return textureData;
-} */
 
 unsigned char* RayTracer::render(Octree& world, int threadCount, int threadIndex) {
 
@@ -201,51 +104,6 @@ unsigned char* RayTracer::render(Octree& world, int threadCount, int threadIndex
     return textureData;
 }
 
-bool RayTracer::validate(Octree& world, Vector3f& position, Vector3f dir) {
-    int worldSize = world.getSize();
-
-    if (world.inWorld(position)) {
-        return true;
-    }
-
-    Vector3f deltaOrigin;
-    Vector3f deltaEnd;
-
-    float deltaXOrigin = -position.x;
-    float deltaXEnd = worldSize - position.x;
-    float tXEnd = deltaXEnd / dir.x;
-    float tXOrigin = deltaXOrigin / dir.x;
-    float t = 0;
-    Vector3f newPosition = position;
-
-    // moved past both points
-    if (tXEnd < 0 && tXOrigin < 0) {
-        return false;
-    }
-    else if (tXEnd < 0) {
-        t = tXOrigin;
-    }
-    else if (tXOrigin < 0) {
-        t = tXEnd;
-    }
-    else {
-        t = fmin(tXEnd, tXOrigin);
-    }
-
-    
-
-
-    newPosition += t * dir;
-
-    if (world.inWorld(newPosition)) {
-        position = newPosition;
-        return true;
-    }
-
-    return false;
-
-}
-
 bool WorldRayIntersction(Octree& world, Vector3f& pos, Vector3f dir) {
     // make 'slabs' for each axis, with an entry and exit 'time' (distance traveled)
     // find the maximum entry time and the minimum exit time
@@ -295,14 +153,14 @@ bool WorldRayIntersction(Octree& world, Vector3f& pos, Vector3f dir) {
     if (exitTime.y < entryTime.y) swap(exitTime.y, entryTime.y);
     if (exitTime.z < entryTime.z) swap(exitTime.z, entryTime.z);
 
-    float maxEntryTime = fmax(entryTime.x, fmax(entryTime.y, entryTime.z));
+    float maxEntryTime = maxFinite(entryTime.x, entryTime.y, entryTime.z);
     float minExitTime = fmin(exitTime.x, fmin(exitTime.y, exitTime.z));
 
     if (minExitTime < 0) {
         return false;
     }
     if (maxEntryTime < minExitTime) {
-        pos += maxEntryTime * dir;
+        pos += (maxEntryTime + 1e-6) * dir;
         return true;
     }
     else {
@@ -372,8 +230,8 @@ void RayTracer::cast(Octree& world, const Vector3f& pos, const Vector3f& dir, un
 
         unsigned int voxel = world.get(currentVoxel);
         if (voxel != 0) {
-            type = voxel;
-            // dist has already beed set
+            type = voxel == OUT_OF_MAP ? 0 : voxel;
+            // dist has already been set
             return;
         }
     }

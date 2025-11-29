@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "util.h"
+#include "constants.h"
 
 class VoxelSpace {
 private:

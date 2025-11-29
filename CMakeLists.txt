@@ -12,6 +12,6 @@ add_executable(VoxelRaytracer
     src/main.cpp
     src/voxel.cpp
     src/raytracer.cpp
-)
+ "src/constants.h")
 
 target_link_libraries(VoxelRaytracer PRIVATE raylib)

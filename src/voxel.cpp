@@ -129,7 +129,7 @@ unsigned int Octree::get(Vector3f pos) {
 		return node->value;
 	}
 	else {
-		return 0;
+		return OUT_OF_MAP;
 	}
 }
 

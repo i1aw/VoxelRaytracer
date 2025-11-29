@@ -3,6 +3,7 @@
 #include <map>
 #include <tuple>
 #include "util.h"
+#include "constants.h"
 
 struct RGBColor {
 	unsigned char red = 0u;

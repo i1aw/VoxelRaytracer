@@ -1,9 +1,6 @@
 #pragma once
 #include <iostream>
 
-static const float PI_F = 3.14159265f;
-static const float HALF_PI = 3.14159265f / 2.0;
-
 struct Vector3f {
     float x;
     float y;
@@ -83,4 +80,20 @@ inline void swap(float& a, float& b) {
     float temp = a;
     a = b;
     b = temp;
+}
+
+inline float maxFinite(float a, float b, float c) {
+    float result = -INFINITY;
+
+    if (!std::isinf(a)) {
+        result = fmax(result, a);
+    }
+    if (!std::isinf(b)) {
+        result = fmax(result, b);
+    }
+    if (!std::isinf(c)) {
+        result = fmax(result, c);
+    }
+
+    return result;
 }
