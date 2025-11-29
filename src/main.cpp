@@ -73,7 +73,6 @@ int main() {
         BeginDrawing();
 
         for (int i = 0; i < THREADS; i++) {
-            //threads[i] = thread(draw, std::ref(texture), std::ref(renderer), std::ref(world), THREADS, i);
             threads[i] = thread(&RayTracer::render, std::ref(renderer), std::ref(OctWorld), THREADS, i);
                 
         }
@@ -84,7 +83,6 @@ int main() {
 
         SetTextureFilter(texture, TEXTURE_FILTER_ANISOTROPIC_16X);
         UpdateTexture(texture, renderer.textureData);
-        //DrawTexture(texture, 0, 0, WHITE);
         Rectangle src = { 0, 0, texture.width, texture.height };
         Rectangle dst = { 0, 0, GetScreenWidth(), GetScreenHeight() };
         DrawTexturePro(texture, src, dst, { 0, 0 }, 0.0f, WHITE);

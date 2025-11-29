@@ -3,23 +3,7 @@
 #include "util.h"
 #include "constants.h"
 
-class VoxelSpace {
-private:
-	int width, height, depth;
-	std::vector<unsigned int> voxels;
-
-public:
-	VoxelSpace(int w, int h, int d)
-		: width(w), height(h), depth(d), voxels(w* h* d, 0) {}
-
-	unsigned int& at(int w, int h, int d);
-	unsigned int get(int w, int h, int d);
-
-	unsigned int& at(Vector3f pos);
-	unsigned int get(Vector3f pos);
-};
-
-//
+// octree node
 struct Node {
 	// either the count of non-zero children or the value of the voxel
 	unsigned int value = 0;

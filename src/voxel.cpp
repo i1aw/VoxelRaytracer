@@ -1,26 +1,5 @@
 #include "voxel.h"
 
-unsigned int& VoxelSpace::at(int w, int h, int d) {
-
-	return voxels[w * width * height + h * height + d];
-}
-
-unsigned int VoxelSpace::get(int w, int h, int d) {
-
-	if (w >= width || w < 0 || h >= height || h < 0 || d >= depth || d < 0) {
-		return 0;
-	}
-
-	return voxels[w * width * height + h * height + d];
-}
-
-unsigned int& VoxelSpace::at(Vector3f pos) {
-	return at(floor(pos.x), floor(pos.y), floor(pos.z));
-}
-unsigned int VoxelSpace::get(Vector3f pos) {
-	return get(floor(pos.x), floor(pos.y), floor(pos.z));
-}
-
 // Octree logic
 
 Octree::Octree(int height) {

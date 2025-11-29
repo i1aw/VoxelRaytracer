@@ -29,16 +29,8 @@ public:
 	RayTracer(int width, int height);
 	~RayTracer();
 
-	//unsigned char* render(VoxelSpace& world);
-	//unsigned char* render(VoxelSpace& world, int threadCount, int threadIndex);
 	unsigned char* render(Octree& world, int threadCount, int threadIndex);
 
-	//unsigned int cast(VoxelSpace& world, float x, float y, float z, float dirX, float dirY, float dirZ);
-	//unsigned int CollinCast(VoxelSpace& world, float x, float y, float z, float dirX, float dirY, float dirZ);
-
-	bool validate(Octree& world, Vector3f& position, Vector3f dir);
-
-	void cast(VoxelSpace& world, const Vector3f& pos, const Vector3f& dir, unsigned int& type, float& dist);
 	void cast(Octree& world, const Vector3f& pos, const Vector3f& dir, unsigned int& type, float& dist);
 	void set(unsigned int x, unsigned int y, RGBColor color);
 
