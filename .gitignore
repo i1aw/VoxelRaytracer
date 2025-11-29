@@ -1,0 +1,11 @@
+/build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+/.vs/
+*.vcxproj*
+*.sln
+x64/
+Debug/
+Release/
