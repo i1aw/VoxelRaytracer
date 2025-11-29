@@ -46,25 +46,6 @@ void Octree::destructorR_(Node*& cur) {
 	cur = nullptr;
 }
 
-/*void Octree::initR_(Node*& cur, int depth) {
-	if (depth + 1 == height) {
-		cur = new Node();
-		return;
-	}
-
-	// create new node
-	cur = new Node;
-	cur->value = 0;
-	cur->children = new Node*[8];
-
-	// create children of node
-	for (int i = 0; i < 8; i++) {
-		cur->children[i] = nullptr;
-		initR_(cur->children[i], depth + 1);
-		cur->children[i]->parent = cur;
-	}
-}*/
-
 void Octree::initR_(Node*& cur, int depth) {
 	cur = new Node;
 	if (depth == height) {
@@ -132,38 +113,6 @@ unsigned int Octree::get(Vector3f pos) {
 		return OUT_OF_MAP;
 	}
 }
-
-/*
-bool Octree::set(Vector3f pos, unsigned int value) {
-	Node* n = getNode(pos);
-	int change = value == 0 ? -1 : 1;
-
-	if (n == nullptr) return false;
-
-	// redundant call
-	if (n->value == value) return true;
-
-	if (n->value != 0 && change == 1) {
-		// setting to another non-zero value, no need to update parents
-		n->value = value;
-		return true;
-	}
-	
-	n->value = value;
-
-	while (n->parent) {
-		n = n->parent;
-		n->value += change;
-		
-		// check if this changed the count of parent
-		// if value is 1, add one to parents
-		// if value is 0, subtract one from parent
-		if (n->value > 1) break; // already had value, no change in parent
-		
-	}
-	return true;
-}
-*/
 
 bool Octree::set(Vector3f pos, unsigned int value) {
 	Node* n = getNode(pos);

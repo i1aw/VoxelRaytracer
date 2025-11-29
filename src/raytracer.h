@@ -21,22 +21,8 @@ private:
 	int width = 0;
 	int height = 0;
 
-	// forward
-	//float camFX;
-	//float camFY;
-	//float camFZ;
 	Vector3f forward;
-			   
-	// up	   
-	//float camUX;
-	//float camUY;
-	//float camUZ;
 	Vector3f up;
-			   
-	// right   
-	//float camRX;
-	//float camRY;
-	//float camRZ;
 	Vector3f right;
 
 public:

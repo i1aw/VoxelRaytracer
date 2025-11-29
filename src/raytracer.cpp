@@ -9,6 +9,7 @@ RayTracer::RayTracer(int width, int height) {
     fov = FOV * (PI_F / 180.0f);
     fd = (width / 2) / tan(fov / 2);
     fdSq = fd * fd;
+    updateVectors();
 
 }
 
