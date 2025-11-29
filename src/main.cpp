@@ -13,7 +13,7 @@ int main() {
 
     int THREADS = std::thread::hardware_concurrency();
     cout << "\nThreads: " << THREADS << "\n\n";
-    const float SENSITIVITY = 1;
+    const float SENSITIVITY = 1.5;
     const float upscaling = 2;
 
     const int SCREEN_WIDTH = 1920;
