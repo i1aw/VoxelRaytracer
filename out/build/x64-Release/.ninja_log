@@ -32,3 +32,5 @@
 39	2563	7860787749185155	external/raylib-master/raylib/CMakeFiles/raylib.dir/raudio.c.obj	4c845913e6f20696
 2563	2663	7860787750099641	external/raylib-master/raylib/raylib.lib	56929b1e7d8e2fa5
 2664	3496	7860787753899694	VoxelRaytracer.exe	a65f56c992008495
+8	451	7860790940542419	CMakeFiles/VoxelRaytracer.dir/src/main.cpp.obj	8bbec8741e3a202f
+451	1280	7860790942809871	VoxelRaytracer.exe	a65f56c992008495
