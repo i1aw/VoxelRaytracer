@@ -10,8 +10,8 @@ add_subdirectory(external/raylib-master)
 
 add_executable(VoxelRaytracer
     src/main.cpp
-    src/voxel.cpp
+    src/SVO.cpp
     src/raytracer.cpp
- "src/constants.h" "src/SVO.h" "src/SVO.cpp")
+)
 
 target_link_libraries(VoxelRaytracer PRIVATE raylib)

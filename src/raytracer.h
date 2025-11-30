@@ -1,5 +1,4 @@
 #pragma once
-#include "Voxel.h"
 #include "SVO.h"
 #include <map>
 #include <tuple>

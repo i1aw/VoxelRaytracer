@@ -1,6 +1,5 @@
 ﻿#include "raylib.h"
 #include "raytracer.h"
-#include "voxel.h"
 #include <iostream>
 #include <thread>
 #include <cassert>
@@ -18,7 +17,6 @@ int main() {
     
     Texture2D texture;
     RayTracer renderer = RayTracer(SCREEN_WIDTH / upscaling, SCREEN_HEIGHT / upscaling);
-    Octree OctWorld = Octree(WORLD_SIZE);
     SparceVoxelOctree SVO = SparceVoxelOctree(WORLD_SIZE);
     unsigned char* textureBytes = nullptr;
 
@@ -28,10 +26,6 @@ int main() {
 
     texture = LoadTextureFromImage(GenImageColor(SCREEN_WIDTH / upscaling, SCREEN_HEIGHT / upscaling, WHITE));
 
-    OctWorld.set({ 0,0,0 }, 1);
-    OctWorld.set({ 2,0,0 }, 1);
-    OctWorld.set({ 1,1,0 }, 1);
-    OctWorld.set({ 1,2,0 }, 1);
     SVO.set({ 0,0,0 }, { 200,0,255 });
     SVO.set({ 2,0,0 }, { 200,0,255 });
     SVO.set({ 1,1,0 }, { 200,0,255 });
