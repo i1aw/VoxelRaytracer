@@ -9,38 +9,8 @@
 
 using namespace std;
 
-void draw(Texture2D& texture, RayTracer& renderer, Octree& world, int threadCount, int threadIndex);
+void draw(Texture2D& texture, RayTracer& renderer, SparceVoxelOctree& world, int threadCount, int threadIndex);
 
-int main() {
-    SparceVoxelOctree world = SparceVoxelOctree(3);
-
-
-    // depth = 0 is root or whole world
-    world.set({ 0,0,0 }, { 100,0,0});
-    world.set({ 1,0,0 }, { 100,0,0 });
-    world.set({ 0,0,1 }, { 0,0,0 });
-    world.set({ 1,0,1 }, { 0,0,0 });
-
-    const SVO_Color* color = world.get({ 0,0,0 }, 2);
-    if (color != nullptr) {
-        cout << (int)color->red << endl;
-    }
-    else {
-        cout << "air" << endl;
-    }
-
-    world.remove({ 0,0,0 });
-
-    color = world.get({ 0,0,0 }, 2);
-    if (color != nullptr) {
-        cout << (int)color->red << endl;
-    }
-    else {
-        cout << "air" << endl;
-    }
-}
-
-/*
 int main() {
 
     int THREADS = 16;
@@ -49,6 +19,7 @@ int main() {
     Texture2D texture;
     RayTracer renderer = RayTracer(SCREEN_WIDTH / upscaling, SCREEN_HEIGHT / upscaling);
     Octree OctWorld = Octree(WORLD_SIZE);
+    SparceVoxelOctree SVO = SparceVoxelOctree(WORLD_SIZE);
     unsigned char* textureBytes = nullptr;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Voxel Renderer");
@@ -61,6 +32,10 @@ int main() {
     OctWorld.set({ 2,0,0 }, 1);
     OctWorld.set({ 1,1,0 }, 1);
     OctWorld.set({ 1,2,0 }, 1);
+    SVO.set({ 0,0,0 }, { 200,0,255 });
+    SVO.set({ 2,0,0 }, { 200,0,255 });
+    SVO.set({ 1,1,0 }, { 200,0,255 });
+    SVO.set({ 1,2,0 }, { 200,0,255 });
 
     DisableCursor();
     
@@ -104,7 +79,7 @@ int main() {
         BeginDrawing();
 
         for (int i = 0; i < THREADS; i++) {
-            threads[i] = thread(&RayTracer::render, std::ref(renderer), std::ref(OctWorld), THREADS, i);
+            threads[i] = thread(&RayTracer::render, std::ref(renderer), std::ref(SVO), THREADS, i);
                 
         }
 
@@ -136,7 +111,6 @@ int main() {
     return 0;
 }
 
-*/
-void draw(Texture2D& texture, RayTracer& renderer, Octree& world, int threadCount, int threadIndex) {
+void draw(Texture2D& texture, RayTracer& renderer, SparceVoxelOctree& world, int threadCount, int threadIndex) {
     UpdateTexture(texture, renderer.render(world, threadCount, threadIndex));
 }

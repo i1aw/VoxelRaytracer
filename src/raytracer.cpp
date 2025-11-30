@@ -55,7 +55,7 @@ void RayTracer::moveRight(float amount) {
 
 }
 
-unsigned char* RayTracer::render(Octree& world, int threadCount, int threadIndex) {
+unsigned char* RayTracer::render(SparceVoxelOctree& world, int threadCount, int threadIndex) {
 
     int linesPerThread = height / threadCount;
 
@@ -85,18 +85,17 @@ unsigned char* RayTracer::render(Octree& world, int threadCount, int threadIndex
             Vector3f RotatedDir = dir.x * right;
             RotatedDir += dir.y * up;
             RotatedDir += dir.z * forward;
-
-            unsigned int color = 0;
+            
             float distance = 0;
-            cast(world, position, RotatedDir, color, distance);
+            const RGBColor* color = cast(world, position, RotatedDir, distance);
 
-            if (color == 1) {
+            if (color == nullptr) {
 
-                set(x, y, fill);
+                set(x, y, background);
 
             }
             else {
-                set(x, y, background);
+                set(x, y, *color);
 
             }
         }
@@ -105,7 +104,7 @@ unsigned char* RayTracer::render(Octree& world, int threadCount, int threadIndex
     return textureData;
 }
 
-bool WorldRayIntersction(Octree& world, Vector3f& pos, Vector3f dir) {
+bool WorldRayIntersction(SparceVoxelOctree& world, Vector3f& pos, Vector3f dir) {
     // make 'slabs' for each axis, with an entry and exit 'time' (distance traveled)
     // find the maximum entry time and the minimum exit time
     // if the entry time is before the exit time, we have an intersection, otherwise we do not
@@ -143,7 +142,7 @@ bool WorldRayIntersction(Octree& world, Vector3f& pos, Vector3f dir) {
     entryTime.x = dir.x != 0 ? -pos.x / dir.x : INFINITY;
     entryTime.y = dir.y != 0 ? -pos.y / dir.y : INFINITY;
     entryTime.z = dir.z != 0 ? -pos.z / dir.z : INFINITY;
-    
+
     Vector3f exitTime;
 
     exitTime.x = dir.x != 0 ? (worldSize - pos.x) / dir.x : INFINITY;
@@ -170,25 +169,24 @@ bool WorldRayIntersction(Octree& world, Vector3f& pos, Vector3f dir) {
 
 }
 
-void RayTracer::cast(Octree& world, const Vector3f& pos, const Vector3f& dir, unsigned int& type, float& dist) {
+const RGBColor* RayTracer::cast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist) {
 
     Vector3f curentPos = pos;
 
     // we never hit the world :(
+    // this is also causing lag problems sometimes, maybe work is not evenly distrubuted among the threads
     if (!WorldRayIntersction(world, curentPos, dir)) {
-        type = 0;
         dist = INFINITY;
-        return;
+        return nullptr;
     }
 
     static const int MAX_T = 100;
 
     Vector3f currentVoxel = make_vec3f(floor(curentPos.x), floor(curentPos.y), floor(curentPos.z));
 
-    if (world.get(currentVoxel) != 0) {
-        type = world.get(currentVoxel);
+    if (world.get(currentVoxel)) {
         dist = 0;
-        return;
+        return world.get(currentVoxel);
     }
 
     // the direction that we step in which is +/- 1
@@ -229,14 +227,13 @@ void RayTracer::cast(Octree& world, const Vector3f& pos, const Vector3f& dir, un
             currentVoxel.z += step.z;
         }
 
-        unsigned int voxel = world.get(currentVoxel);
-        if (voxel != 0) {
-            type = voxel == OUT_OF_MAP ? 0 : voxel;
-            // dist has already been set
-            return;
+        const RGBColor* color = world.get(currentVoxel);
+        if (color) {
+            return color;
+
         }
     }
 
-    type = 0;
     dist = INFINITY;
+    return nullptr;
 }

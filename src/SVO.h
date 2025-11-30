@@ -1,9 +1,10 @@
+#pragma once
 #include "util.h"
 
 struct SVO_Node {
 	// if leaf, the color of that voxel
 	// if non-leaf, the average color of children nodes
-	SVO_Color color;
+	RGBColor color;
 
 	// the children of the node
 	SVO_Node** children = nullptr;
@@ -36,13 +37,13 @@ public:
 	// mutators and accessors
 
 	// gets a voxel at a world position. Gives a depth limit.
-	const SVO_Color* get(Vector3f pos, int maxDepth = INT_MAX);
+	const RGBColor* get(Vector3f pos, int maxDepth = INT_MAX);
 
 	// gets a voxel at a location and returns the depth at that location
-	//const SVO_Color* getMaxDepth(Vector3f pos, int& depth);
+	//const RGBColor* getMaxDepth(Vector3f pos, int& depth);
 
 	// sets a voxel at a depth
-	bool set(Vector3f pos, SVO_Color color, int maxDepth = INT_MAX);
+	bool set(Vector3f pos, RGBColor color, int maxDepth = INT_MAX);
 
 	// removes voxel at depth;
 	bool remove(Vector3f pos, int maxDepth = INT_MAX);

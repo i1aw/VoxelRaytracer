@@ -2,10 +2,10 @@
 #include <iostream>
 #include <cstdint>
 
-struct SVO_Color {
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
+struct RGBColor {
+    unsigned char red = 0u;
+    unsigned char green = 0u;
+    unsigned char blue = 0u;
 };
 
 struct Vector3f {

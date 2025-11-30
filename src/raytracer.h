@@ -1,15 +1,10 @@
 #pragma once
 #include "Voxel.h"
+#include "SVO.h"
 #include <map>
 #include <tuple>
 #include "util.h"
 #include "constants.h"
-
-struct RGBColor {
-	unsigned char red = 0u;
-	unsigned char green = 0u;
-	unsigned char blue = 0u;
-};
 
 struct collisionData {
 	unsigned int voxelType = 0;
@@ -29,9 +24,11 @@ public:
 	RayTracer(int width, int height);
 	~RayTracer();
 
-	unsigned char* render(Octree& world, int threadCount, int threadIndex);
+	unsigned char* render(SparceVoxelOctree& world, int threadCount, int threadIndex);
+	//unsigned char* render(Octree& world, int threadCount, int threadIndex);
 
-	void cast(Octree& world, const Vector3f& pos, const Vector3f& dir, unsigned int& type, float& dist);
+	//void cast(Octree& world, const Vector3f& pos, const Vector3f& dir, unsigned int& type, float& dist);
+	const RGBColor* cast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist);
 	void set(unsigned int x, unsigned int y, RGBColor color);
 
 	void updateVectors();

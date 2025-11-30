@@ -67,10 +67,13 @@ void updateColorAveragesR_(SVO_Node* cur) {
 
 	bool changedToClear = cur->parent->filledChildCount >= 4 && childCount < 4;
 	cur->parent->filledChildCount = childCount;
-
-	// if there are less then half filled children, it will be clear
-	// otherwise, we change the color and update its parent
-	if (childCount >= 4) {
+	
+	if (childCount == 0) {// combine 8 air voxels into 1
+		destroyR_(cur);
+	}
+	else if (childCount >= 4) {
+		// if there are less then half filled children, it will be clear
+		// otherwise, we change the color and update its parent
 		avgRed /= childCount;
 		avgGreen /= childCount;
 		avgBlue /= childCount;
@@ -85,7 +88,7 @@ void updateColorAveragesR_(SVO_Node* cur) {
 	
 }
 
-const SVO_Color* SparceVoxelOctree::get(Vector3f pos, int maxDepth) {
+const RGBColor* SparceVoxelOctree::get(Vector3f pos, int maxDepth) {
 	if (!inWorld(pos)) return nullptr;
 	int curDepth = 0;
 	int sideLength = getSize();
@@ -130,7 +133,7 @@ const SVO_Color* SparceVoxelOctree::get(Vector3f pos, int maxDepth) {
 	}
 }
 
-bool SparceVoxelOctree::set(Vector3f pos, SVO_Color color, int maxDepth) {
+bool SparceVoxelOctree::set(Vector3f pos, RGBColor color, int maxDepth) {
 	if (!inWorld(pos)) return false;
 
 	uint32_t x = floor(pos.x);
