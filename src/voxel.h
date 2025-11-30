@@ -4,26 +4,28 @@
 #include "constants.h"
 
 // octree node
-struct Node {
+struct OctreeNode {
 	// either the count of non-zero children or the value of the voxel
 	unsigned int value = 0;
-	Node* parent = nullptr;
-	Node** children = nullptr;
+	OctreeNode* parent = nullptr;
+	OctreeNode** children = nullptr;
 };
 
 class Octree {
 private:
 	int height = 0;
-	Node* root = nullptr;
+	OctreeNode* root = nullptr;
 
-	void initR_(Node*& cur, int curHeight);
-	void destructorR_(Node*& cur);
+	void initR_(OctreeNode*& cur, int curHeight);
+	void destructorR_(OctreeNode*& cur);
 
 public:
 	Octree(int height);
 	~Octree();
 	
-	Node* getNode(Vector3f pos);
+	OctreeNode* getNode(Vector3f pos);
+	bool setNode(Vector3f pos, unsigned int value);
+
 	int getSize();
 	bool inWorld(Vector3f pos);
 

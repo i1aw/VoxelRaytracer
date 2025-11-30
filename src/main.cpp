@@ -5,14 +5,45 @@
 #include <thread>
 #include <cassert>
 #include "constants.h"
+#include "SVO.h"
 
 using namespace std;
 
 void draw(Texture2D& texture, RayTracer& renderer, Octree& world, int threadCount, int threadIndex);
 
 int main() {
+    SparceVoxelOctree world = SparceVoxelOctree(3);
 
-    int THREADS = std::thread::hardware_concurrency();
+
+    // depth = 0 is root or whole world
+    world.set({ 0,0,0 }, { 100,0,0});
+    world.set({ 1,0,0 }, { 100,0,0 });
+    world.set({ 0,0,1 }, { 0,0,0 });
+    world.set({ 1,0,1 }, { 0,0,0 });
+
+    const SVO_Color* color = world.get({ 0,0,0 }, 2);
+    if (color != nullptr) {
+        cout << (int)color->red << endl;
+    }
+    else {
+        cout << "air" << endl;
+    }
+
+    world.remove({ 0,0,0 });
+
+    color = world.get({ 0,0,0 }, 2);
+    if (color != nullptr) {
+        cout << (int)color->red << endl;
+    }
+    else {
+        cout << "air" << endl;
+    }
+}
+
+/*
+int main() {
+
+    int THREADS = 16;
     cout << "\nThreads: " << THREADS << "\n\n";
     
     Texture2D texture;
@@ -105,6 +136,7 @@ int main() {
     return 0;
 }
 
+*/
 void draw(Texture2D& texture, RayTracer& renderer, Octree& world, int threadCount, int threadIndex) {
     UpdateTexture(texture, renderer.render(world, threadCount, threadIndex));
 }

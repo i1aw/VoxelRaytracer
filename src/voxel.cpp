@@ -12,7 +12,7 @@ Octree::~Octree() {
 	destructorR_(root);
 }
 
-void Octree::destructorR_(Node*& cur) {
+void Octree::destructorR_(OctreeNode*& cur) {
 	if (!cur) return;
 
 	if (cur->children) {
@@ -25,8 +25,8 @@ void Octree::destructorR_(Node*& cur) {
 	cur = nullptr;
 }
 
-void Octree::initR_(Node*& cur, int depth) {
-	cur = new Node;
+void Octree::initR_(OctreeNode*& cur, int depth) {
+	cur = new OctreeNode;
 	if (depth == height) {
 		// quit if this is a leaf node, no children
 		return;
@@ -34,7 +34,7 @@ void Octree::initR_(Node*& cur, int depth) {
 	else {
 
 		// node has children
-		cur->children = new Node*[8];
+		cur->children = new OctreeNode*[8];
 
 		for (int i = 0; i < 8; i++) {
 			cur->children[i] = nullptr;
@@ -44,8 +44,8 @@ void Octree::initR_(Node*& cur, int depth) {
 	}
 }
 
-Node* Octree::getNode(Vector3f pos) {
-	static Node* null = nullptr;
+OctreeNode* Octree::getNode(Vector3f pos) {
+	static OctreeNode* null = nullptr;
 	Vector3f curPos = pos;
 
 	const int sideLength = 1 << height;
@@ -54,7 +54,7 @@ Node* Octree::getNode(Vector3f pos) {
 	if (pos.z > sideLength - 1 || pos.z < 0) return null;
 
 	int curSide = sideLength;
-	Node* cur = root;
+	OctreeNode* cur = root;
 
 	// node 0 is the left, bottom, near node (in that order)
 	// moves right first, then up, then out
@@ -83,7 +83,7 @@ Node* Octree::getNode(Vector3f pos) {
 }
 
 unsigned int Octree::get(Vector3f pos) {
-	Node* node = getNode(pos);
+	OctreeNode* node = getNode(pos);
 
 	if (node != nullptr) {
 		return node->value;
@@ -94,7 +94,7 @@ unsigned int Octree::get(Vector3f pos) {
 }
 
 bool Octree::set(Vector3f pos, unsigned int value) {
-	Node* n = getNode(pos);
+	OctreeNode* n = getNode(pos);
 	if (n == nullptr) return false; // check if node is valid
 	if (n->value == value) return true; // no change needed
 

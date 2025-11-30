@@ -1,5 +1,12 @@
 #pragma once
 #include <iostream>
+#include <cstdint>
+
+struct SVO_Color {
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+};
 
 struct Vector3f {
     float x;
@@ -97,3 +104,4 @@ inline float maxFinite(float a, float b, float c) {
 
     return result;
 }
+
