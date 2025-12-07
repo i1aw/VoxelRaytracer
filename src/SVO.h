@@ -38,6 +38,8 @@ public:
 
 	// gets a voxel at a world position. Gives a depth limit.
 	const RGBColor* get(Vector3f pos, int maxDepth = INT_MAX);
+	const RGBColor* get(Vector3f pos, int& voxelSize, int maxDepth);
+
 
 	// gets a voxel at a location and returns the depth at that location
 	//const RGBColor* getMaxDepth(Vector3f pos, int& depth);
@@ -47,7 +49,6 @@ public:
 
 	// removes voxel at depth;
 	bool remove(Vector3f pos, int maxDepth = INT_MAX);
-	
 
 
 };

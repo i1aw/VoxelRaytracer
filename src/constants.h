@@ -10,6 +10,7 @@ const float upscaling = 2;
 const float FOV = 70;
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
+const float minLighting = 0.5;
 
 // controls
 const float SENSITIVITY = 1.5;

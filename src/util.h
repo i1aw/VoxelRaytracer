@@ -1,4 +1,5 @@
 #pragma once
+//#define TESTING
 #include <iostream>
 #include <cstdint>
 

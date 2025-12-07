@@ -4,6 +4,7 @@
 #include <tuple>
 #include "util.h"
 #include "constants.h"
+#include <cmath>
 
 struct collisionData {
 	unsigned int voxelType = 0;
@@ -28,6 +29,7 @@ public:
 
 	//void cast(Octree& world, const Vector3f& pos, const Vector3f& dir, unsigned int& type, float& dist);
 	const RGBColor* cast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist);
+	const RGBColor* fastCast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist);
 	void set(unsigned int x, unsigned int y, RGBColor color);
 
 	void updateVectors();
@@ -45,5 +47,8 @@ public:
 	float fdSq = 1;
 
 	unsigned char* textureData = nullptr;
+
+	Vector3f lightDir = make_vec3f(0, -1, 0);
+	float brightnessMap[6];
 };
 

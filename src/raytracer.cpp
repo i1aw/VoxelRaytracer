@@ -87,7 +87,7 @@ unsigned char* RayTracer::render(SparceVoxelOctree& world, int threadCount, int 
             RotatedDir += dir.z * forward;
             
             float distance = 0;
-            const RGBColor* color = cast(world, position, RotatedDir, distance);
+            const RGBColor* color = fastCast(world, position, RotatedDir, distance);
 
             if (color == nullptr) {
 
@@ -104,7 +104,7 @@ unsigned char* RayTracer::render(SparceVoxelOctree& world, int threadCount, int 
     return textureData;
 }
 
-bool WorldRayIntersction(SparceVoxelOctree& world, Vector3f& pos, Vector3f dir) {
+bool WorldRayIntersection(SparceVoxelOctree& world, Vector3f& pos, Vector3f dir) {
     // make 'slabs' for each axis, with an entry and exit 'time' (distance traveled)
     // find the maximum entry time and the minimum exit time
     // if the entry time is before the exit time, we have an intersection, otherwise we do not
@@ -169,22 +169,28 @@ bool WorldRayIntersction(SparceVoxelOctree& world, Vector3f& pos, Vector3f dir) 
 
 }
 
-const RGBColor* RayTracer::cast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist) {
+const RGBColor* RayTracer::cast(
+    SparceVoxelOctree& world,
+    const Vector3f& pos,
+    const Vector3f& dir,
+    float& dist
+) {
 
-    Vector3f curentPos = pos;
+    Vector3f currentPos = pos;
+    Vector3f deltaVoxelBorder;
+    static const int MAX_T = 100;
+    int voxelSize = 1;
+    int jumpAmount = 1;
 
     // we never hit the world :(
-    // this is also causing lag problems sometimes, maybe work is not evenly distrubuted among the threads
-    if (!WorldRayIntersction(world, curentPos, dir)) {
+    if (!WorldRayIntersection(world, currentPos, dir)) {
         dist = INFINITY;
         return nullptr;
     }
 
-    static const int MAX_T = 100;
+    Vector3f currentVoxel = make_vec3f(floor(currentPos.x), floor(currentPos.y), floor(currentPos.z));
 
-    Vector3f currentVoxel = make_vec3f(floor(curentPos.x), floor(curentPos.y), floor(curentPos.z));
-
-    if (world.get(currentVoxel)) {
+    if (world.get(currentVoxel, voxelSize, 999)) {
         dist = 0;
         return world.get(currentVoxel);
     }
@@ -198,9 +204,9 @@ const RGBColor* RayTracer::cast(SparceVoxelOctree& world, const Vector3f& pos, c
 
     // distance from the origin to the next boundary
     Vector3f tMax = make_vec3f(
-        dir.x != 0 ? ((dir.x > 0 ? 1 : 0) - curentPos.x + currentVoxel.x) / dir.x : INFINITY,
-        dir.y != 0 ? ((dir.y > 0 ? 1 : 0) - curentPos.y + currentVoxel.y) / dir.y : INFINITY,
-        dir.z != 0 ? ((dir.z > 0 ? 1 : 0) - curentPos.z + currentVoxel.z) / dir.z : INFINITY
+        dir.x != 0 ? ((dir.x > 0 ? 1 : 0) - currentPos.x + currentVoxel.x) / dir.x : INFINITY,
+        dir.y != 0 ? ((dir.y > 0 ? 1 : 0) - currentPos.y + currentVoxel.y) / dir.y : INFINITY,
+        dir.z != 0 ? ((dir.z > 0 ? 1 : 0) - currentPos.z + currentVoxel.z) / dir.z : INFINITY
     );
 
     // distance 't' for ray to move right one voxel.
@@ -211,6 +217,7 @@ const RGBColor* RayTracer::cast(SparceVoxelOctree& world, const Vector3f& pos, c
     );
 
     for (int t = 0; t < MAX_T; t++) {
+        std::cout << "(" << currentVoxel.x << ", " << currentVoxel.y << ", " << currentVoxel.z << ")\n";
         if (tMax.x < tMax.y && tMax.x < tMax.z) {
             dist = tMax.x;
             tMax.x += tDelta.x;
@@ -226,14 +233,122 @@ const RGBColor* RayTracer::cast(SparceVoxelOctree& world, const Vector3f& pos, c
             tMax.z += tDelta.z;
             currentVoxel.z += step.z;
         }
+        
+        // exit if left world
+        if (!world.inWorld(currentVoxel)) {
+            dist = INFINITY;
+            return nullptr;
+        }
 
-        const RGBColor* color = world.get(currentVoxel);
+        // exit if we hit something
+        const RGBColor* color = world.get(currentVoxel, voxelSize, 999);
         if (color) {
             return color;
 
         }
     }
 
+    // ran out of render distance, return infinity
     dist = INFINITY;
     return nullptr;
+}
+
+const RGBColor* RayTracer::fastCast(
+    SparceVoxelOctree& world,
+    const Vector3f& pos,
+    const Vector3f& dir,
+    float& dist) {
+
+
+    const static RGBColor* null = nullptr;
+
+    const int MAX_STEPS = 20;
+    int curStep = 0;
+
+    float t = 0;
+    int voxelSize = 1;
+
+
+    Vector3f curPos = pos;
+    Vector3f curVox = make_vec3f(floor(pos.x), floor(pos.y), floor(pos.z));
+    int curScale = 1; // the current partition size we are stepping through
+    int minScale = 1; // sets the 'resolution' of the cast, can be increased when ray is far away
+
+    // quit if ray never enters world, otherwise return position where it hits
+    if (!WorldRayIntersection(world, curPos, dir)) {
+        dist = INFINITY;
+        return null;
+    }
+
+    // makes the scope of the hitVoxel variable not the whole function
+    {
+        const RGBColor* hitVoxel = world.get(curPos, curScale, 999);
+        if (hitVoxel) {
+            dist = 0;
+            return hitVoxel;
+        }
+    }
+
+
+    do {
+#ifdef TESTING
+        std::cout << "(" << (int)curPos.x << ", " << (int)curPos.y << ", " << (int)curPos.z << ") " << curScale << std::endl;
+#endif
+        
+        voxelSize = 1 << (curScale - 1);
+
+        // the direction that we step in which is +/- 1
+        Vector3f step = make_vec3f(
+            dir.x < 0 ? -1 : 1,
+            dir.y < 0 ? -1 : 1,
+            dir.z < 0 ? -1 : 1
+        );
+
+        // find the max distance 't' travelable before the next voxel border.
+        Vector3f tMax = make_vec3f(
+            dir.x > 0 ? voxelSize - fmod(curPos.x, voxelSize) : fmod(curPos.x, voxelSize),
+            dir.y > 0 ? voxelSize - fmod(curPos.y, voxelSize) : fmod(curPos.y, voxelSize),
+            dir.z > 0 ? voxelSize - fmod(curPos.z, voxelSize) : fmod(curPos.z, voxelSize)
+        );
+
+        if (tMax.x == 0)
+            tMax.x = voxelSize;
+        if (tMax.y == 0)
+            tMax.y = voxelSize;
+        if (tMax.z == 0)
+            tMax.z = voxelSize;
+
+        tMax.x = dir.x != 0 ? tMax.x / dir.x * step.x: INFINITY;
+        tMax.y = dir.y != 0 ? tMax.y / dir.y * step.y: INFINITY;
+        tMax.z = dir.z != 0 ? tMax.z / dir.z * step.z: INFINITY;
+
+        t = fmin(tMax.x, fmin(tMax.y, tMax.z));
+        dist += t;
+
+        curPos.x += t * dir.x;
+        curPos.y += t * dir.y;
+        curPos.z += t * dir.z;
+
+        
+        if (step.x < 0)
+            curPos.x -= 1e-5;
+        if (step.y < 0)
+            curPos.y -= 1e-5;
+        if (step.z < 0)
+            curPos.z -= 1e-5;
+        
+
+        if (!world.inWorld(curPos)) {
+            dist = INFINITY;
+            return null;
+        }
+
+        const RGBColor* hitVoxel = world.get(curPos, curScale, 999);
+        if (hitVoxel) {
+            return hitVoxel;
+        }
+
+        curStep++;
+    } while (curStep < MAX_STEPS);
+
 }

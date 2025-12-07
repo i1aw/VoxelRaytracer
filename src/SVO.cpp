@@ -41,9 +41,9 @@ int SparceVoxelOctree::getSize() {
 bool SparceVoxelOctree::inWorld(Vector3f pos) {
 	int worldSize = getSize();
 
-	return pos.x >= 0 && pos.x <= worldSize &&
-		pos.y >= 0 && pos.y <= worldSize &&
-		pos.z >= 0 && pos.z <= worldSize;
+	return pos.x >= 0 && pos.x < worldSize &&
+		pos.y >= 0 && pos.y < worldSize &&
+		pos.z >= 0 && pos.z < worldSize;
 }
 
 void updateColorAveragesR_(SVO_Node* cur) {
@@ -125,6 +125,55 @@ const RGBColor* SparceVoxelOctree::get(Vector3f pos, int maxDepth) {
 		curDepth++;
 	}
 	if (cur->filledChildCount >= 4) {
+		return &cur->color;
+
+	}
+	else {
+		return nullptr;
+	}
+}
+
+const RGBColor* SparceVoxelOctree::get(Vector3f pos, int& voxelSize, int maxDepth) {
+	if (!inWorld(pos)) return nullptr;
+	int curDepth = 0;
+	int sideLength = getSize();
+	Node* cur = root;
+
+	uint32_t x = floor(pos.x);
+	uint32_t y = floor(pos.y);
+	uint32_t z = floor(pos.z);
+
+	while (curDepth < height && curDepth < maxDepth) {
+		sideLength >>= 1;
+		// there are no children, return early
+		if (!cur->children) {
+			voxelSize = sideLength << 1;
+			return nullptr;
+		}
+		int nextIndex = 0;
+
+		// check if our x/y/z is greater then half of the curent partition side length
+		if (x >= sideLength) {
+			x -= sideLength;
+			nextIndex |= 1u;
+		}
+		if (y >= sideLength) {
+			y -= sideLength;
+			nextIndex |= 2u;
+		}
+		if (z >= sideLength) {
+			z -= sideLength;
+			nextIndex |= 4u;
+		}
+
+		cur = cur->children[nextIndex];
+
+		curDepth++;
+	}
+	voxelSize = (int)getSize() >> curDepth;
+
+	if (cur->filledChildCount >= 4) {
+		
 		return &cur->color;
 
 	}
