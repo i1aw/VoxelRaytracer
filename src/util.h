@@ -84,6 +84,10 @@ inline Vector3f& operator/=(Vector3f& v, float s) noexcept {
     return v;
 }
 
+inline float operator*(Vector3f a, Vector3f b) noexcept {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
 inline void swap(float& a, float& b) {
     float temp = a;
     a = b;
@@ -106,3 +110,9 @@ inline float maxFinite(float a, float b, float c) {
     return result;
 }
 
+inline RGBColor operator*(RGBColor v, float s) noexcept {
+    v.red *= s;
+    v.green *= s;
+    v.blue *= s;
+    return v;
+}

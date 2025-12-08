@@ -28,8 +28,7 @@ public:
 	//unsigned char* render(Octree& world, int threadCount, int threadIndex);
 
 	//void cast(Octree& world, const Vector3f& pos, const Vector3f& dir, unsigned int& type, float& dist);
-	const RGBColor* cast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist);
-	const RGBColor* fastCast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist);
+	const RGBColor* fastCast(SparceVoxelOctree& world, const Vector3f& pos, const Vector3f& dir, float& dist, int& normal);
 	void set(unsigned int x, unsigned int y, RGBColor color);
 
 	void updateVectors();
@@ -48,7 +47,7 @@ public:
 
 	unsigned char* textureData = nullptr;
 
-	Vector3f lightDir = make_vec3f(0, -1, 0);
+	Vector3f lightDir = make_vec3f(0.2594, -0.8024, 0.5371);
 	float brightnessMap[6];
 };
 

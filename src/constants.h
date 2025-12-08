@@ -17,7 +17,7 @@ const float SENSITIVITY = 1.5;
 const float MOVEMENT_SPEED = 2.5; // units / second
 
 // world
-const unsigned int WORLD_SIZE = 2;
+const unsigned int WORLD_SIZE = 4;
 
 // voxel get API 
 static const unsigned int OUT_OF_MAP = UINT_MAX;
