@@ -136,17 +136,17 @@ bool WorldRayIntersection(SparceVoxelOctree& world, Vector3f& pos, Vector3f dir,
 
     // check if we are not moving in a specific axis.
     // if we are not, we have to already be inside of the slab to intersect
-    if (fabs(dir.x) <= 1e-8) {
+    if (fabs(dir.x) <= 1e-7) {
         if (pos.x < 0 || pos.x > worldSize) {
             return false;
         }
     }
-    if (fabs(dir.y) <= 1e-8) {
+    if (fabs(dir.y) <= 1e-7) {
         if (pos.y < 0 || pos.y > worldSize) {
             return false;
         }
     }
-    if (fabs(dir.z) <= 1e-8) {
+    if (fabs(dir.z) <= 1e-7) {
         if (pos.z < 0 || pos.z > worldSize) {
             return false;
         }
@@ -173,14 +173,17 @@ bool WorldRayIntersection(SparceVoxelOctree& world, Vector3f& pos, Vector3f dir,
     float maxEntryTime = maxFinite(entryTime.x, entryTime.y, entryTime.z);
     float minExitTime = fmin(exitTime.x, fmin(exitTime.y, exitTime.z));
 
+
+
     if (minExitTime < 0) {
         return false;
     }
     if (maxEntryTime < minExitTime) {
-        if (maxEntryTime = entryTime.x) normal = 0 + (dir.x > 0);
-        if (maxEntryTime = entryTime.y) normal = 2 + (dir.y > 0);
-        if (maxEntryTime = entryTime.z) normal = 4 + (dir.z > 0);
+        if (abs(maxEntryTime - entryTime.x) < 1e-7) normal = 0 + (dir.x > 0);
+        if (abs(maxEntryTime - entryTime.y) < 1e-7) normal = 2 + (dir.y > 0);
+        if (abs(maxEntryTime - entryTime.z) < 1e-7) normal = 4 + (dir.z > 0);
         pos += (maxEntryTime + 1e-6) * dir;
+
         return true;
     }
     else {

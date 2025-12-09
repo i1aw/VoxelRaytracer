@@ -24,7 +24,7 @@ int main() {
     SVO.set({ 0,0,0 }, { 255,0,0 });
 
 
-    const RGBColor* color = renderer.fastCast(SVO, { 0,7.9,0 }, { 0,-1,0 }, distance, normal);
+    const RGBColor* color = renderer.fastCast(SVO, { 0,-1,0 }, { 0,1,0 }, distance, normal);
     if (color) {
         cout << (int)color->red << endl;
     }
@@ -50,6 +50,21 @@ int main() {
 
     texture = LoadTextureFromImage(GenImageColor(SCREEN_WIDTH / upscaling, SCREEN_HEIGHT / upscaling, WHITE));
 
+    const RGBColor GREY = { 101, 107, 115 };
+
+    SVO.set({ 0,0,0 }, GREY);
+    SVO.set({ 0,0,1 }, GREY);
+    SVO.set({ 0,1,0 }, GREY);
+    SVO.set({ 0,1,1 }, GREY);
+    SVO.set({ 1,0,0 }, GREY);
+    SVO.set({ 1,0,1 }, GREY);
+    SVO.set({ 1,1,0 }, GREY);
+    SVO.set({ 1,1,1 }, GREY);
+
+
+
+
+    /*
     SVO.set({ 0, 0, 0 }, { 101, 107, 115 });
     SVO.set({ 0, 0, 3 }, { 101, 107, 115 });
     SVO.set({ 0, 3, 0 }, { 101, 107, 115 });
@@ -82,7 +97,7 @@ int main() {
     SVO.set({ 3, 0, 2 }, { 101, 107, 115 });
     SVO.set({ 3, 3, 1 }, { 101, 107, 115 });
     SVO.set({ 3, 3, 2 }, { 101, 107, 115 });
-
+    */
 
     DisableCursor();
     
