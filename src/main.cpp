@@ -16,14 +16,15 @@ int main() {
 
     float distance;
     int size;
+    int normal = 0;
 
     // 4x4x4
-    SparceVoxelOctree SVO = SparceVoxelOctree(4);
+    SparceVoxelOctree SVO = SparceVoxelOctree(3);
     RayTracer renderer = RayTracer(1, 1);
-    SVO.set({ 0,15,0 }, { 255,0,0 });
+    SVO.set({ 0,0,0 }, { 255,0,0 });
 
 
-    const RGBColor* color = renderer.fastCast(SVO, { 1,0,0 }, { 0,1,0 }, distance);
+    const RGBColor* color = renderer.fastCast(SVO, { 0,7.9,0 }, { 0,-1,0 }, distance, normal);
     if (color) {
         cout << (int)color->red << endl;
     }

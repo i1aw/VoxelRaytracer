@@ -218,7 +218,7 @@ const RGBColor* RayTracer::fastCast(
 
     // makes the scope of the hitVoxel variable not the whole function
     {
-        const RGBColor* hitVoxel = world.get(curPos, curScale, 999);
+        const RGBColor* hitVoxel = world.get(curPos, voxelSize, 999);
         if (hitVoxel) {
             dist = 0;
             return hitVoxel;
@@ -227,10 +227,10 @@ const RGBColor* RayTracer::fastCast(
 
     do {
 #ifdef TESTING
-        std::cout << "(" << (int)curPos.x << ", " << (int)curPos.y << ", " << (int)curPos.z << ") " << curScale << std::endl;
+        std::cout << "(" << (int)curPos.x << ", " << (int)curPos.y << ", " << (int)curPos.z << ") scale: " << curScale << std::endl;
 #endif
         
-        voxelSize = 1 << (curScale - 1);
+        //voxelSize = 1 << (curScale - 1);
 
         // the direction that we step in which is +/- 1
         Vector3f step = make_vec3f(
@@ -240,8 +240,6 @@ const RGBColor* RayTracer::fastCast(
         );
 
         // find the max distance 't' travelable before the next voxel border.
-       
-
         Vector3f tMax = make_vec3f(
             dir.x > 0 ? voxelSize - fmod(curPos.x, voxelSize) : fmod(curPos.x, voxelSize),
             dir.y > 0 ? voxelSize - fmod(curPos.y, voxelSize) : fmod(curPos.y, voxelSize),
@@ -258,6 +256,9 @@ const RGBColor* RayTracer::fastCast(
         tMax.x = dir.x != 0 ? tMax.x / dir.x * step.x : INFINITY;
         tMax.y = dir.y != 0 ? tMax.y / dir.y * step.y : INFINITY;
         tMax.z = dir.z != 0 ? tMax.z / dir.z * step.z : INFINITY;
+        if (tMax.x < 0) tMax.x = INFINITY;
+        if (tMax.y < 0) tMax.y = INFINITY;
+        if (tMax.z < 0) tMax.z = INFINITY;
 
         if (tMax.x <= tMax.y && tMax.x <= tMax.z) {
             normal = 0 + (step.x > 0);
@@ -266,6 +267,11 @@ const RGBColor* RayTracer::fastCast(
         else if (tMax.y <= tMax.z) {
             normal = 2 + (step.y > 0);
             t = tMax.y;
+#ifdef TESTING
+            std::cout << "tMax.y: " << tMax.y << ", t: " << t << '\n';
+
+#endif // TESTING
+
         }
         else {
             normal = 4 + (step.z > 0);
@@ -278,12 +284,16 @@ const RGBColor* RayTracer::fastCast(
         curPos.y += t * dir.y;
         curPos.z += t * dir.z;
 
+#ifdef TESTING
+        std::cout << "(" << (int)curPos.x << ", " << (int)curPos.y << ", " << (int)curPos.z << ") " << curScale << std::endl;
+#endif
+
         if (!world.inWorld(curPos)) {
             dist = INFINITY;
             return null;
         }
 
-        const RGBColor* hitVoxel = world.get(curPos, curScale, 999);
+        const RGBColor* hitVoxel = world.get(curPos, voxelSize, 999);
         if (hitVoxel) {
             return hitVoxel;
         }

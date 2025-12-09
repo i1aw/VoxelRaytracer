@@ -41,9 +41,9 @@ int SparceVoxelOctree::getSize() {
 bool SparceVoxelOctree::inWorld(Vector3f pos) {
 	int worldSize = getSize();
 
-	return pos.x >= 0 && pos.x < worldSize &&
-		pos.y >= 0 && pos.y < worldSize &&
-		pos.z >= 0 && pos.z < worldSize;
+	return pos.x >= 0 && pos.x <= worldSize &&
+		pos.y >= 0 && pos.y <= worldSize &&
+		pos.z >= 0 && pos.z <= worldSize;
 }
 
 void updateColorAveragesR_(SVO_Node* cur) {
@@ -57,9 +57,8 @@ void updateColorAveragesR_(SVO_Node* cur) {
 
 	for (int i = 0; i < 8; i++) {
 		SVO_Node* n = cur->parent->children[i];
+		if (n->filledChildCount > 0) childCount++;
 		if (n->filledChildCount < 4) continue;
-
-		childCount++;
 		avgRed += n->color.red;
 		avgGreen += n->color.green;
 		avgBlue += n->color.blue;
@@ -170,7 +169,7 @@ const RGBColor* SparceVoxelOctree::get(Vector3f pos, int& voxelSize, int maxDept
 
 		curDepth++;
 	}
-	voxelSize = (int)getSize() >> curDepth;
+	voxelSize = getSize() >> curDepth;
 
 	if (cur->filledChildCount >= 4) {
 		
@@ -207,6 +206,7 @@ bool SparceVoxelOctree::set(Vector3f pos, RGBColor color, int maxDepth) {
 			if (cur->children) {
 				for (int i = 0; i < 8; i++) {
 					destroyR_(cur->children[i]);
+					cur->children = nullptr;
 				}
 			}
 
