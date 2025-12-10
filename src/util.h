@@ -116,3 +116,9 @@ inline RGBColor operator*(RGBColor v, float s) noexcept {
     v.blue *= s;
     return v;
 }
+
+inline int goodMod(int a, int b) {
+    int answer = a % b;
+    answer += answer < 0 ? b : 0;
+    return answer;
+}
