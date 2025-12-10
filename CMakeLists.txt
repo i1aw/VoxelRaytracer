@@ -12,6 +12,6 @@ add_executable(VoxelRaytracer
     src/main.cpp
     src/SVO.cpp
     src/raytracer.cpp
-)
+ "src/terrain.cpp" "src/terrain.h")
 
 target_link_libraries(VoxelRaytracer PRIVATE raylib)

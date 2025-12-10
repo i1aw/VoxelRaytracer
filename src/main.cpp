@@ -5,6 +5,7 @@
 #include <cassert>
 #include "constants.h"
 #include "SVO.h"
+#include "terrain.h"
 
 //#define TESTING
 
@@ -36,33 +37,30 @@ int main() {
 #ifndef TESTING
 
 int main() {
-    int THREADS = 16;
+    int THREADS = std::thread::hardware_concurrency();
     cout << "\nThreads: " << THREADS << "\n\n";
     
     Texture2D texture;
+    TerrainGenerator gen = TerrainGenerator();
     RayTracer renderer = RayTracer(SCREEN_WIDTH / upscaling, SCREEN_HEIGHT / upscaling);
+    renderer.position.y = 10.0f;
     SparceVoxelOctree SVO = SparceVoxelOctree(WORLD_SIZE);
+    gen.Generate(SVO);
     unsigned char* textureBytes = nullptr;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Voxel Renderer");
 
-    SetTargetFPS(100000);
+    SetTargetFPS(INFINITY);
 
     texture = LoadTextureFromImage(GenImageColor(SCREEN_WIDTH / upscaling, SCREEN_HEIGHT / upscaling, WHITE));
 
     const RGBColor GREY = { 101, 107, 115 };
 
     SVO.set({ 0,0,0 }, GREY);
-    SVO.set({ 0,0,1 }, GREY);
-    SVO.set({ 0,1,0 }, GREY);
-    SVO.set({ 0,1,1 }, GREY);
-    SVO.set({ 1,0,0 }, GREY);
-    SVO.set({ 1,0,1 }, GREY);
-    SVO.set({ 1,1,0 }, GREY);
-    SVO.set({ 1,1,1 }, GREY);
-
-
-
+    SVO.set({ 2, 0, 0 }, GREY);
+    SVO.set({ 1, 1, 0 }, GREY);
+    SVO.set({ 1, 2, 0 }, GREY);
+    SVO.set({ 1, 3, 0 }, GREY);
 
     /*
     SVO.set({ 0, 0, 0 }, { 101, 107, 115 });

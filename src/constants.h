@@ -14,10 +14,12 @@ const float minLighting = 0.5;
 
 // controls
 const float SENSITIVITY = 1.5;
-const float MOVEMENT_SPEED = 2.5; // units / second
+const float MOVEMENT_SPEED = 5; // units / second
 
 // world
-const unsigned int WORLD_SIZE = 4;
+// dementions = 2 ^ WORLD_SIZE
+// 1 = 1
+const unsigned int WORLD_SIZE = 6;
 
 // voxel get API 
 static const unsigned int OUT_OF_MAP = UINT_MAX;

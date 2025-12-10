@@ -173,8 +173,6 @@ bool WorldRayIntersection(SparceVoxelOctree& world, Vector3f& pos, Vector3f dir,
     float maxEntryTime = maxFinite(entryTime.x, entryTime.y, entryTime.z);
     float minExitTime = fmin(exitTime.x, fmin(exitTime.y, exitTime.z));
 
-
-
     if (minExitTime < 0) {
         return false;
     }
@@ -201,7 +199,7 @@ const RGBColor* RayTracer::fastCast(
 
     const static RGBColor* null = nullptr;
 
-    const int MAX_STEPS = 20;
+    const int MAX_STEPS = 100;
     int curStep = 0;
 
     float t = 0;
